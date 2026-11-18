@@ -1,0 +1,149 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class MattressSalesGUI extends JFrame implements ActionListener {
+
+    private JTextField txtCustomerName, txtProductName, txtPrice;
+    private JLabel lblVAT, lblCommission, lblTotal;
+    private JButton btnCalculate, btnClear;
+
+    private static final double VAT_RATE = 0.15;
+    private static final double COMMISSION_RATE = 0.05;
+
+    public MattressSalesGUI() {
+        setTitle("Mattress Sales Management System");
+        setSize(450, 350);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        mainPanel.add(new JLabel("Customer Name:"), gbc);
+        gbc.gridx = 1;
+        txtCustomerName = new JTextField(20);
+        mainPanel.add(txtCustomerName, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        mainPanel.add(new JLabel("Product Name:"), gbc);
+        gbc.gridx = 1;
+        txtProductName = new JTextField(20);
+        mainPanel.add(txtProductName, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        mainPanel.add(new JLabel("Product Price (R):"), gbc);
+        gbc.gridx = 1;
+        txtPrice = new JTextField(20);
+        mainPanel.add(txtPrice, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
+        btnCalculate = new JButton("Calculate");
+        btnCalculate.addActionListener(this);
+        btnClear = new JButton("Clear");
+        btnClear.addActionListener(this);
+        btnPanel.add(btnCalculate);
+        btnPanel.add(btnClear);
+        mainPanel.add(btnPanel, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        JPanel resultPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        resultPanel.setBorder(BorderFactory.createTitledBorder("Sales Summary"));
+
+        resultPanel.add(new JLabel("VAT (15%):"));
+        lblVAT = new JLabel("R 0.00");
+        resultPanel.add(lblVAT);
+
+        resultPanel.add(new JLabel("Commission (5%):"));
+        lblCommission = new JLabel("R 0.00");
+        resultPanel.add(lblCommission);
+
+        resultPanel.add(new JLabel("Total Sale Amount:"));
+        lblTotal = new JLabel("R 0.00");
+        resultPanel.add(lblTotal);
+
+        mainPanel.add(resultPanel, gbc);
+        add(mainPanel);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnCalculate) {
+            calculateSales();
+        } else if (e.getSource() == btnClear) {
+            clearForm();
+        }
+    }
+
+    private void calculateSales() {
+        try {
+            String customer = txtCustomerName.getText().trim();
+            String product = txtProductName.getText().trim();
+            String priceText = txtPrice.getText().trim();
+
+            if (customer.isEmpty() || product.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Please fill in Customer Name and Product Name!",
+                        "Missing Information",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (priceText.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Please enter a price!",
+                        "Missing Price",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            double price = Double.parseDouble(priceText);
+
+            if (price <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Price must be greater than 0!",
+                        "Invalid Price",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            double vat = price * VAT_RATE;
+            double commission = price * COMMISSION_RATE;
+            double total = price + vat + commission;
+
+            lblVAT.setText(String.format("R %.2f", vat));
+            lblCommission.setText(String.format("R %.2f", commission));
+            lblTotal.setText(String.format("R %.2f", total));
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Please enter a valid number for Price!",
+                    "Invalid Input",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void clearForm() {
+        txtCustomerName.setText("");
+        txtProductName.setText("");
+        txtPrice.setText("");
+        lblVAT.setText("R 0.00");
+        lblCommission.setText("R 0.00");
+        lblTotal.setText("R 0.00");
+        txtCustomerName.requestFocus();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new MattressSalesGUI().setVisible(true);
+            }
+        });
+    }
+}
